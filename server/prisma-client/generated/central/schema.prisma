@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../prisma-client/generated/central"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  contact     String?
+  country     String?
+  state       String?
+  city        String?
+  zipCode     String?
+  fullAddress String?
+  createdAt   DateTime @default(now())
+
+  currentSessionToken String?
+  lastLoginAt         DateTime?
+
+  reminders     Reminder[]
+  notifications Notification[]
+}
+
+model Reminder {
+  id               String            @id @default(uuid())
+  title            String
+  description      String
+  notificationType NotificationType?
+  leadStatus       LeadStatus        @default(HOT)
+
+  reminderAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isConverted Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  notifications Notification[]
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  reminderId String?
+  reminder   Reminder? @relation(fields: [reminderId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+enum LeadStatus {
+  HOT
+  COLD
+}
+
+enum NotificationType {
+  EMAIL
+  IN_APP
+}

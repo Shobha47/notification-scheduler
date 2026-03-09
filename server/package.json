@@ -1,0 +1,73 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Notification Scheduler",
+  "main": "index.js",
+  "bin": "dist/setup-tenant.js",
+  "pkg": {
+    "scripts": [
+      "dist/**/*.js",
+      "utils/**/*.js"
+    ],
+    "assets": [
+      "prisma/central/schema.prisma"
+    ]
+  },
+  "scripts": {
+    "start": "ts-node-dev --respawn server.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate:central": "npx prisma generate --schema=prisma/central/schema.prisma",
+    "validate:central": "npx prisma validate --schema=prisma/central/schema.prisma",
+    "migrate:central": "npx prisma migrate dev --schema=prisma/central/schema.prisma",
+    "deploy:central": "cross-env DATABASE_URL=$CENTRAL_DATABASE_URL prisma migrate deploy --schema=prisma/central/schema.prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "@reduxjs/toolkit": "^2.9.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.18",
+    "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.2",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.16.3",
+    "rate-limit-redis": "^4.2.3",
+    "react-redux": "^9.2.0",
+    "resend": "^6.1.0",
+    "slugify": "^1.6.6",
+    "socket.io": "^4.8.1",
+    "yargs": "^18.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/exceljs": "^0.5.3",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.7.2",
+    "@types/nodemailer": "^7.0.11",
+    "@types/pdfkit": "^0.17.3",
+    "@types/pg": "^8.15.5",
+    "@types/yargs": "^17.0.33",
+    "cross-env": "^10.0.0",
+    "prisma": "^6.16.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
