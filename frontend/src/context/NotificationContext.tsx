@@ -1,81 +1,4 @@
-// import React, { createContext, useContext, useState, useEffect } from "react";
-// import { socket } from "@/app/utils/socket";
-// import dayjs from "dayjs";
-// import relativeTime from "dayjs/plugin/relativeTime";
 
-// // Extend dayjs with the relativeTime plugin
-// dayjs.extend(relativeTime);
-
-// interface Notification {
-//   id: string;
-//   notificationMessage: string;
-//   createdAt: string;
-//   // add fields as needed
-// }
-
-// // Define the type of data you want to share
-// interface NotificationContextType {
-//   notifications: Notification[];
-//   unreadCount: number;
-//   markAllRead: () => void;
-// }
-
-// const NotificationContext = createContext<NotificationContextType | undefined>(
-//   undefined,
-// );
-
-// export const NotificationProvider = ({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) => {
-//   const [notifications, setNotifications] = useState<Notification[]>([]);
-//   const [unreadCount, setUnreadCount] = useState(0);
-
-//   useEffect(() => {
-//     socket.connect();
-
-//     const handleNotification = (data: any) => {
-//       const newNotification = {
-//         id: crypto.randomUUID(), // generate ID on the fly
-//         notificationMessage: data.notificationMessage || data.message,
-//         createdAt: data.createdAt,
-//       };
-
-//       setNotifications((prev) => [newNotification, ...prev]);
-//       setUnreadCount((count) => count + 1);
-//       console.log("Get Notification from SocketIo", data);
-//     };
-
-//     socket.on("followup-notification", handleNotification);
-//     socket.on("new-followup-notification", handleNotification);
-//     socket.on("payments-notification", handleNotification);
-//     socket.on("new-payment-notification", handleNotification);
-
-//     return () => {
-//       socket.off("followup-notification", handleNotification);
-//       socket.off("new-followup-notification", handleNotification);
-//       socket.off("payments-notification", handleNotification);
-//       socket.off("new-payment-notification", handleNotification);
-//       socket.disconnect();
-//     };
-//   }, []);
-
-//   const markAllRead = () => {
-//     setUnreadCount(0);
-//     setNotifications([]);
-//   };
-
-//   return (
-//     <NotificationContext.Provider
-//       value={{ notifications, unreadCount, markAllRead }}
-//     >
-//       {children}
-//     </NotificationContext.Provider>
-//   );
-// };
-
-// export const useNotifications = () => useContext(NotificationContext);
 
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
@@ -110,37 +33,38 @@ export const NotificationProvider = ({
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
 
-    socket.connect();
+    if (!user?.id) return;
 
-    const handleNotification = (data: any, type: "REMINDER" | "REMINDER") => {
-    
+    socket.connect();
+    socket.emit("join", user.id);
+
+    const handleNotification = (data: any) => {
 
       const newNotification = {
-        id: crypto.randomUUID(),
-        notificationMessage: data.notificationMessage || data.message,
+        id: data.id,
+        notificationMessage: data.notificationMessage,
         createdAt: data.createdAt,
       };
 
+      console.log("🔔 Notification received:", newNotification);
+
       setNotifications((prev) => [newNotification, ...prev]);
       setUnreadCount((c) => c + 1);
-      console.log("Notification received:", data);
     };
 
-    // FOLLOW-UP NOTIFICATIONS → only Frontdesk + Admin
-    socket.on("reminder-notification", (data) =>
-      handleNotification(data, "REMINDER"),
-    );
-    socket.on("new-reminder-notification", (data) =>
-      handleNotification(data, "REMINDER"),
-    );
+    socket.on("reminder-notification", handleNotification);
+    socket.on("new-reminder-notification", handleNotification);
 
     return () => {
-      socket.disconnect();
+      socket.off("reminder-notification", handleNotification);
+      socket.off("new-reminder-notification", handleNotification);
     };
-  }, []);
+
+  }, [user]);
 
   const markAllRead = () => {
     setUnreadCount(0);

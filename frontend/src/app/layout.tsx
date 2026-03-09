@@ -30,8 +30,10 @@ export default function RootLayout({
           <ReactQueryProvider>
             <ThemeProvider>
               <SidebarProvider>
-                <NotificationProvider>{children}</NotificationProvider>
+                <NotificationProvider>
+                  {children}
                 <GlobalDisableSignin />
+                </NotificationProvider>
               </SidebarProvider>
             </ThemeProvider>
           </ReactQueryProvider>

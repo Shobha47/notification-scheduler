@@ -19,6 +19,8 @@ export default function NotificationDropdown() {
 
   const { notifications, unreadCount, markAllRead } = context;
 
+  console.log("DROPDOWN NOTIFICATIONS:", notifications);
+
   useEffect(() => {
     if(notifications.length >= 1) {
       setNotifying(true);
@@ -101,7 +103,7 @@ export default function NotificationDropdown() {
             </li>
           ) : (
             notifications.map((notification, index) => (
-              <li key={index}>
+              <li key={notification.id}>
                 <DropdownItem
                   onItemClick={closeDropdown}
                   className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"

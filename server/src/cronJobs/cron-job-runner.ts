@@ -2,17 +2,18 @@ import cron from "node-cron";
 import { centralPrisma } from "../prisma-client/central-client";
 import { getIO } from "../utils/socket";
 import nodemailer from "nodemailer";
+import { sendMail } from "../utils/mailer";
 
 // Configure email transport
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: Boolean(process.env.SMTP_SECURE),
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   host: process.env.SMTP_HOST,
+//   port: Number(process.env.SMTP_PORT),
+//   secure: Boolean(process.env.SMTP_SECURE),
+//   auth: {
+//     user: process.env.SMTP_USER,
+//     pass: process.env.SMTP_PASS,
+//   },
+// });
 
 export const startReminderCron = () => {
   cron.schedule("* * * * *", async () => {
@@ -43,6 +44,7 @@ export const startReminderCron = () => {
         });
 
         console.log("GET AL NOTIIFCTAION:", notification);
+        console.log("GET USER:", reminder.user);
 
         // ✅ Send notification based on type
         if (reminder.notificationType === "IN_APP") {
@@ -56,11 +58,13 @@ export const startReminderCron = () => {
         } else if (reminder.notificationType === "EMAIL") {
           // Send email
           if (reminder.user.email) {
-            await transporter.sendMail({
-              from: `"Your App" <${process.env.SMTP_USER}>`,
+            await sendMail({
               to: reminder.user.email,
               subject: "Reminder Notification",
-              text: `${reminder.title}\n\n${reminder.description || ""}`,
+              emailHtml: `
+                <h3>${reminder.title}</h3>
+                <p>${reminder.description || ""}</p>
+              `,
             });
             console.log(`📧 Email Reminder sent to ${reminder.user.email}`);
           }
