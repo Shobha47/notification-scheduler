@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 import { getUser } from "@/lib/api";
 import MasterAdminLayout from "../UserDashboard";
@@ -58,4 +60,5 @@ export default function AdminLayout({
     <MasterAdminLayout user={user}>{children}</MasterAdminLayout>
   );
 }
+
 
