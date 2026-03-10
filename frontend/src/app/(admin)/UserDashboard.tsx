@@ -21,7 +21,7 @@ export default function MasterAdminLayout({
 }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar()
 
-  useEffect(() => {
+ useEffect(() => {
     if (!user || !user.id) return;
 
     // Connect and join user's room
@@ -32,8 +32,8 @@ export default function MasterAdminLayout({
 
     // Listen for notifications
     socket.on("reminder-notification", (data) => {
-      console.log("🔔 New Reminder notification:", data.notificationMessage);
-      console.log("🔔 New Reminder DATA notification:", data);
+      console.log("🔔 New Reminder notification:", data.message);
+      console.log("🔔 New Reminder notification:", data);
       // Update UI, show toast, badge, etc.
     });
 
@@ -76,3 +76,4 @@ export default function MasterAdminLayout({
     </ProtectedRoute>
   );
 }
+
