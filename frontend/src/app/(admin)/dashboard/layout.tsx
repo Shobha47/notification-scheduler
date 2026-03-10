@@ -13,8 +13,9 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
 
-  const [userData, setUserData] = useState<any>(null);
+  const user = useSelector((state: RootState) => state.auth.user);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     async function fetchUser() {
@@ -34,7 +35,7 @@ export default function AdminLayout({
 
         console.log("het Uset ata in Admin Layout:", data);
         console.log("het Uset ata in Admin Layout:", data.user);
-        setUserData(data.user);
+        dispatch(setUser(data.user));
       } catch (err) {
         router.replace("/signin");
       } finally {
@@ -54,6 +55,7 @@ export default function AdminLayout({
 }
 
   return (
-    <MasterAdminLayout user={userData}>{children}</MasterAdminLayout>
+    <MasterAdminLayout user={user}>{children}</MasterAdminLayout>
   );
 }
+
