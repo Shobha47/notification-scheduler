@@ -36,34 +36,35 @@ export const NotificationProvider = ({
   const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-
-    if (!user?.id) return;
+    console.log("user in notification provider:", user);
+    if (!user || !user?.id) return; // wait for user
 
     socket.connect();
-    socket.emit("join", user.id);
 
-    const handleNotification = (data: any) => {
+    const handleNotification = (data: any, type: "REMINDER" | "REMINDER") => {
 
       const newNotification = {
         id: data.id,
-        notificationMessage: data.notificationMessage,
+        notificationMessage: data.notificationMessage || data.message,
         createdAt: data.createdAt,
       };
 
-      console.log("🔔 Notification received:", newNotification);
-
       setNotifications((prev) => [newNotification, ...prev]);
       setUnreadCount((c) => c + 1);
+      console.log("Notification received:", data);
     };
 
-    socket.on("reminder-notification", handleNotification);
-    socket.on("new-reminder-notification", handleNotification);
+    
+    socket.on("reminder-notification", (data) =>
+      handleNotification(data, "REMINDER"),
+    );
+    socket.on("new-reminder-notification", (data) =>
+      handleNotification(data, "REMINDER"),
+    );
 
     return () => {
-      socket.off("reminder-notification", handleNotification);
-      socket.off("new-reminder-notification", handleNotification);
+      socket.disconnect();
     };
-
   }, [user]);
 
   const markAllRead = () => {
@@ -91,3 +92,4 @@ export const useNotifications = () => {
   }
   return ctx;
 };
+
